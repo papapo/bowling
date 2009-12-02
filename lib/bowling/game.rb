@@ -1,56 +1,74 @@
 module Bowling
-	class Game
-		def initialize
-			@rolls = []
+	class RollCursor
+		def initialize(rolls)
+			@rolls = rolls
+			@idx = 0
 		end
 
-		def roll(pins)
-			@rolls << pins
+		def strike?
+			self.roll == 10
 		end
 
-		def score
-			score = 0
-			roll_idx = 0
-			10.times do
-				if strike?(roll_idx)#strike
-					score += roll_at(roll_idx)#pins
-					score += strike_bonus(roll_idx)
-					roll_idx += 1
-				elsif spare?(roll_idx)#spare
-					score += two_rolls_from(roll_idx) #pins
-					score += spare_bonus(roll_idx)
-					roll_idx += 2
-				else # ather
-					score += two_rolls_from(roll_idx)#pins
-					roll_idx += 2
-				end
-			end
-			score
+		def spare?
+			self.two_rolls == 10
 		end
 
-		private
-		def strike?(idx)
-			roll_at(idx)==10
+		def strike_bonus
+			self.two_rolls_from(@idx + 1)
 		end
 
-		def spare?(idx)
-			two_rolls_from(idx)==10
+		def spare_bonus
+			self.roll_at(@idx + 2)
 		end
 
-		def strike_bonus(idx)
-			two_rolls_from(idx + 1)
+		def roll
+			self.roll_at(@idx)
 		end
 
-		def spare_bonus(idx)
-			roll_at(idx + 2)
+		def two_rolls
+			self.two_rolls_from(@idx)
 		end
 
-		def roll_at(idx) 
-			@rolls[idx]
+		def advance(n)
+			@idx += n
 		end
 
-		def two_rolls_from(idx)
-			@rolls[idx] + @rolls[idx + 1]
+		def roll_at(index)
+			@rolls[index]
+		end
+
+		def two_rolls_from(index)
+			@rolls[index] + @rolls[index + 1]
 		end
 	end
+
+		class Game
+			def initialize
+				@rolls = []
+			end
+
+			def roll(pins)
+				@rolls << pins
+			end
+
+			def score
+				score = 0
+				cur = RollCursor.new(@rolls)
+				10.times do
+					if cur.strike?
+						score += cur.roll
+						score += cur.strike_bonus
+						cur.advance(1)
+					elsif cur.spare?
+						score += cur.two_rolls
+						score += cur.spare_bonus
+						cur.advance(2)
+					else
+						score += cur.two_rolls
+						cur.advance(2)
+					end
+				end
+				score
+			end
+		end
 end
