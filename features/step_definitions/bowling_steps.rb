@@ -6,6 +6,11 @@ end
 	@game.roll(10)
 end
 
+もし /^スペアをとる$/ do
+	もし "5ピン倒す"
+	もし "5ピン倒す"
+end
+
 もし /^(\d+)ピン倒す$/ do |pins|
 	@game.roll(pins.to_i)
 end
