@@ -13,14 +13,16 @@ module Bowling
 			self.two_rolls == 10
 		end
 
-		def strike_bonus
-			self.two_rolls_from(@idx + 1)
+		def bonus
+			if self.strike?
+				self.two_rolls_from(@idx +1)
+			elsif self.spare?
+				self.roll_at(@idx + 2)
+			else
+				0
+			end
 		end
-
-		def spare_bonus
-			self.roll_at(@idx + 2)
-		end
-
+		
 		def roll
 			self.roll_at(@idx)
 		end
@@ -61,10 +63,10 @@ module Bowling
 			10.times do
 				if cur.strike?
 					score += cur.roll
-					score += cur.strike_bonus
+					score += cur.bonus
 				elsif cur.spare?
 					score += cur.two_rolls
-					score += cur.spare_bonus
+					score += cur.bonus
 				else
 					score += cur.two_rolls
 				end
